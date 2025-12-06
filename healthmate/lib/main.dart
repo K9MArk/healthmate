@@ -1,37 +1,34 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
-
-// Screens
-import 'screens/login.dart';
-import 'screens/signup.dart';
-import 'screens/dashboard.dart';
-import 'screens/add_record.dart';
-import 'screens/record_list.dart';
-import 'screens/settings.dart';
+import 'package:flutter/foundation.dart' show kIsWeb; // add this
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'screens/splash_screen.dart';
 
 void main() {
-  runApp(HealthMateApp());
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Only init FFI on real Windows desktop (not web)
+  if (!kIsWeb && Platform.isWindows) {
+    sqfliteFfiInit();
+    databaseFactory = databaseFactoryFfi;
+  }
+
+  runApp(const HealthMateApp());
 }
 
 class HealthMateApp extends StatelessWidget {
+  const HealthMateApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      title: 'HealthMate',
       debugShowCheckedModeBanner: false,
-      title: "HealthMate",
-      theme: ThemeData(primarySwatch: Colors.blue),
-
-      // Starting screen of the app
-      initialRoute: '/login',
-
-      // Navigation routes
-      routes: {
-        '/login': (context) => LoginScreen(),
-        '/signup': (context) => SignupScreen(),
-        '/dashboard': (context) => DashboardScreen(),
-        '/addRecord': (context) => AddRecordScreen(),
-        '/recordList': (context) => RecordListScreen(),
-        '/settings': (context) => SettingsScreen(),
-      },
+      theme: ThemeData(
+        useMaterial3: true,
+        colorSchemeSeed: Colors.blue,
+      ),
+      home: SplashScreen(), // <-- remove const
     );
   }
 }
